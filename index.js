@@ -19,7 +19,13 @@ server.on('request', (req, res) => {
 	const items = req.url.split('/');
 	// /friends/2 => ['', 'friends', '2']
 
-	if (items[1] === 'friends') {
+	if (req.method === 'POST' && items[1] === 'friends') {
+		req.on('data', (buffer) => {
+			const friend = buffer.toString();
+			console.log('Request: ', friend);
+			friends.push(JSON.parse(friend));
+		});
+	} else if (req.method === 'GET' && items[1] === 'friends') {
 		res.statusCode = 200;
 		res.setHeader('Content-Type', 'application/json');
 
@@ -28,7 +34,7 @@ server.on('request', (req, res) => {
 		} else {
 			res.end(JSON.stringify(friends));
 		}
-	} else if (items[1] === 'messages') {
+	} else if (req.method === 'GET' && items[1] === 'messages') {
 		res.statusCode = 200;
 		res.setHeader('Content-Type', 'text/plain');
 		res.end('this is another response');
